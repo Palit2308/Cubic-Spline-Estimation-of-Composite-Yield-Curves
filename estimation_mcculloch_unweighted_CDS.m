@@ -6,7 +6,12 @@ elseif boot==0
     df_interest=zeros(12,T);    
 end
 
+
+
 for t=1:T
+
+    disp(t);
+    
     
     % Here we should subtract all future cashflow with cds premia
     % cds_adjust=zeros(K-t+1,N); 
@@ -14,6 +19,9 @@ for t=1:T
     coupon_all2(coupon_all2==0 | coupon_all2>=100)=NaN; %pick all pure cupon dates
     cdspremia_rep=repmat(cdspremia(t,:),K-t+1,1);
     coupon_cds_adjusted=coupon_all2-cdspremia_rep;
+
+   
+
     coupon_all3=coupon_all(t:K,:);
     coupon_all3(coupon_all3<100)=0; % pick the repayment events (set all pure coupon dates to zero)
     coupon_cds_adjusted(isnan(coupon_cds_adjusted)==1)=0;
@@ -22,12 +30,15 @@ for t=1:T
     
     %% Apply Cubic B-Spline to estimate the term structure
     % Sort cashflow matrix (C) and maturity matrix (dtm) such that the N bonds are arranged in ascending order by their maturity dates
-
+    
     C=coupon_cds_adjusted;
     p=price(t,:)+cds_initial(t,:);
+    
+    
     DTM=flipud(dtm(t:end,:));
     DTM=DTM+1;
-
+    
+    
    % Delet all rows, which contains only NaNs
    % M(~any(~isnan(M), 2),:)=[];
     
@@ -35,23 +46,32 @@ for t=1:T
     % Find NaN price values and remove
     
     [row_p,col_p]=find(isnan(p));
+    
+    
     C(:,col_p)=[];
+    
     p(:,col_p)=[];
     DTM(:,col_p)=[];
-
+    
     [row_dtm, col_dtm]=find(isnan(DTM(end,:)));
     C(:,col_dtm)=[];
+    
     p(:,col_dtm)=[];
     DTM(:,col_dtm)=[];
     
+    
     KK=max(DTM(end,:));
+    
+    
     M = (1:KK)';
-    C(KK+1:end,:)=[];
+    
+    C(floor(KK + 1):end, :) = [];
     
     % Rearrange the matrices in ascending order 
     [d1,d2]=sort(DTM(end,:));
     DTM=DTM(:,d2);
     C=C(:,d2);
+   
     p=p(:,d2);
     
     % New number of bonds (all NaN values are removed)
@@ -84,6 +104,8 @@ for t=1:T
     %g=cubicspline2([2 183 365 730 1095 1460 1825],S);
     g=cubicspline2([2 183 365 730 1095 1460 1825 2190 2555 2920 3285 3650],S);
     
+    disp(size(C));
+    disp(size(G));
     
     %B=B(:,(1:size(B,2)-5));
     %g=g(:,1:4);

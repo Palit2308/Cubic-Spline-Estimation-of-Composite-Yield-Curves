@@ -1,0 +1,16 @@
+clear 
+clc
+close all
+
+% Bootstrap 
+boot=1; % If bootstrap, boot=1;
+num_boot=5000;
+
+%country = {'Ireland'};
+country = {'Italy'}; 
+          
+
+% Unweighted least squares
+[df_interest_datastream_foreign_all] = df_corporate_unweighted_CDS(country, boot, num_boot);
+
+save('C:/Users/defaultuser0/Desktop/Sneha_thesis/Discount_Rate/boot1/Cor_CDS/df_interest_corporate_CDS_Italy', 'df_interest_datastream_foreign_all', '-v7.3');
